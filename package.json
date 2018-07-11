@@ -2,16 +2,25 @@
   "name": "gtasks",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://dreamer20.github.io/gtasks",
   "dependencies": {
     "@material-ui/core": "^1.2.3",
+    "gh-pages": "^1.2.0",
     "prop-types": "^15.6.2",
-    "query-string": "^6.1.0",
+    "qs": "^6.5.2",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-redux": "^5.0.7",
-    "react-scripts": "1.1.4"
+    "react-scripts": "1.1.4",
+    "redux": "^4.0.0",
+    "redux-thunk": "^2.3.0"
+  },
+  "dev-dependencies": {
+    "fetch-mock": "^6.5.0"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -b master -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
