@@ -5,7 +5,7 @@ const TOKEN_INFO_ENDPOINT = 'https://www.googleapis.com/oauth2/v3/tokeninfo';
 const REVOKE_TOKEN_ENDPOINT = 'https://accounts.google.com/o/oauth2/revoke';
 
 const CLIENT_ID = '822102553032-ks13fvqvesf5jimq124em0hfndmt7u7q.apps.googleusercontent.com';
-const REDIRECT_URI = 'https://dreamer20.github.com/gtasks';
+const REDIRECT_URI = 'https://dreamer20.github.io/gtasks';
 const RESPONSE_TYPE = 'token';
 const SCOPE = 'https://www.googleapis.com/auth/tasks ' +
               'https://www.googleapis.com/auth/tasks.readonly ' +
