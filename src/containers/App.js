@@ -43,13 +43,14 @@ class App extends Component {
         <div className={classes.root}>
         <TasksBar />
         <TasksDrawer />
-        
-        <main className={classes.content}>
-        <div className={classes.toolbar} />
-        { isFetching ?
-          <LinearProgress className={classes.progress} color="secondary" /> : 
-          null }
-        { currentScreen }</main>
+        <div className={classes.wrapper}>
+          <div className={classes.toolbar} />
+          { isFetching ?
+            <LinearProgress className={classes.progress} color="secondary" /> : 
+            null }
+          <main className={classes.content}>
+          { currentScreen }</main>
+        </div>
         </div>
       </Fragment>
     );
@@ -80,10 +81,24 @@ const styles = theme => ({
   progress: {
     marginTop: -5
   },
-  toolbar: theme.mixins.toolbar,
+  toolbar: {
+    ...theme.mixins.toolbar,
+    marginBottom: 5
+  },
   content: {
+    height: `calc(100% - 61px)`,
+    '@media (min-width:0px) and (orientation: landscape)': {
+      height: `calc(100% - 53px)`
+    },
+    '@media (min-width:600px)': {
+      height: `calc(100% - 69px)`
+    },
+    overflow: 'auto'
+  },
+  wrapper: {
     flexGrow: 1,
-    marginTop: 5
+    height: '100vh',
+    // display: 'flex'
   }
 });
 

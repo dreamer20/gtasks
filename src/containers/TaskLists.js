@@ -8,7 +8,7 @@ import { selectTasklist } from '../actions/';
 
 class TaskLists extends Component {
   render() {
-    const { tasklists, selectTasklist } = this.props;
+    const { tasklists, selectTasklist, children } = this.props;
     let list = [];
 
     for (let tasklistID in tasklists) {
@@ -21,6 +21,7 @@ class TaskLists extends Component {
 
     return (
       <List>
+        {children}
         {list}
       </List>
     );    
