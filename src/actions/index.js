@@ -69,6 +69,19 @@ export const addTasklist = (title) => (dispatch) => {
   });
 };
 
+export const deleteTasklist = (tasklistID) => (dispatch) => {
+  const settings = {
+    path: `tasks/v1/users/@me/lists/${tasklistID}`,
+    method: 'DELETE'
+  }
+  return dispatch(sendRequest(settings)).then(() => {
+    dispatch({
+      type: types.DELETE_TASKLIST,
+      tasklistID
+    });
+  });
+};
+
 const fetchAvatar = () => dispatch => {
   const settings = {
     path: `plus/v1/people/me`
@@ -92,7 +105,9 @@ const sendRequest = settings => dispatch => {
 
 export const selectTasklist = tasklistID => (dispatch, getState) => {
   const state = getState();
+  console.log(state);
   if (!state.tasks[tasklistID]) {
+    console.log('is fetching');
     dispatch(fetchTasks(tasklistID))
       .then(() => dispatch({
         type: types.SELECT_TASKLIST,
