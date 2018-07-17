@@ -23,6 +23,11 @@ export default settings => {
         }
         return Promise.reject(new Error(response.statusText));
       }
+
+      if (response.status === 204) {
+        return;
+      }
+      
       return response.json();
     }
   ).then(data => {
