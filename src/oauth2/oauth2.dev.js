@@ -5,7 +5,7 @@ const TOKEN_INFO_ENDPOINT = 'https://www.googleapis.com/oauth2/v3/tokeninfo';
 const REVOKE_TOKEN_ENDPOINT = 'https://accounts.google.com/o/oauth2/revoke';
 
 const CLIENT_ID = '822102553032-ks13fvqvesf5jimq124em0hfndmt7u7q.apps.googleusercontent.com';
-const REDIRECT_URI = 'https://dreamer20.github.io/gtasks';
+const REDIRECT_URI = 'http://localhost:3000';
 const RESPONSE_TYPE = 'token';
 const SCOPE = 'https://www.googleapis.com/auth/tasks ' +
               'https://www.googleapis.com/auth/tasks.readonly ' +
@@ -110,9 +110,3 @@ export default {
   revokeUserAuthorization,
   checkUserAuthorization
 };
-
-if (process.env.NODE_ENV === 'production') {
-  module.exports = require('./oauth2.prod.js');
-} else {
-  module.exports = require('./oauth2.dev.js');
-}

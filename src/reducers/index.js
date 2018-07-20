@@ -12,6 +12,21 @@ const tasklists = (state = {}, action) => {
         ...state,
         ...taskLists
       };
+    case types.RECEIVE_TASKLIST:
+      return {
+        ...state,
+        [action.tasklist.id]: action.tasklist
+      };
+    case types.DELETE_TASKLIST:
+      delete state[action.tasklistID];
+      return {
+        ...state
+      };
+    case types.RENAME_TASKLIST:
+      return {
+        ...state,
+        [action.tasklistID]: action.tasklist
+      };
     default:
       return state;
   }
@@ -80,6 +95,17 @@ const selectedTasklist = (state = null, action) => {
   }
 };
 
+const isAuthorized = (state = false, action) => {
+  switch (action.type) {
+    case types.SET_AUTHORIZATION:
+      return true;
+    case types.RESET_AUTHORIZATION:
+      return false;
+    default:
+      return state;
+  }
+};
+
 export const getTasksByTasklistID = (tasks, selectedTasklist) => ({
   ...tasks[selectedTasklist]
 });
@@ -92,5 +118,6 @@ export default combineReducers({
   isFetching,
   avatarURL,
   tasks,
-  selectedTasklist
+  selectedTasklist,
+  isAuthorized
 });

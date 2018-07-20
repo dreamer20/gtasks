@@ -8,6 +8,9 @@ export const initApp = () => (dispatch, getState) => {
       if (!isAuthorized) {
         dispatch(setScreen('login'));
       } else {
+        dispatch({
+          type: types.SET_AUTHORIZATION
+        });
         dispatch(fetchTasklists());
         dispatch(fetchAvatar());
       }
@@ -50,6 +53,56 @@ export const fetchTasks = (tasklistID) => (dispatch, getState) => {
   });
 };
 
+export const addTasklist = (title) => (dispatch) => {
+  const settings = {
+    path: `tasks/v1/users/@me/lists`,
+    method: 'POST',
+    body: {
+      title
+    }
+  };
+  
+  return dispatch(sendRequest(settings)).then((tasklist) => {
+    dispatch({
+      type: types.RECEIVE_TASKLIST,
+      tasklist
+    });
+  });
+};
+
+export const deleteTasklist = (tasklistID) => (dispatch) => {
+  const settings = {
+    path: `tasks/v1/users/@me/lists/${tasklistID}`,
+    method: 'DELETE'
+  };
+
+  return dispatch(sendRequest(settings)).then(() => {
+    dispatch({
+      type: types.DELETE_TASKLIST,
+      tasklistID
+    });
+  });
+};
+
+export const renameTasklist = (tasklistID, newTitle) => (dispatch) => {
+  const settings = {
+    path: `tasks/v1/users/@me/lists/${tasklistID}`,
+    method: 'PUT',
+    body: {
+      id: tasklistID,
+      title: newTitle
+    }
+  };
+
+  return dispatch(sendRequest(settings)).then((tasklist) => {
+    dispatch({
+      type: types.RENAME_TASKLIST,
+      tasklistID,
+      tasklist
+    });
+  });
+};
+
 const fetchAvatar = () => dispatch => {
   const settings = {
     path: `plus/v1/people/me`
@@ -60,7 +113,7 @@ const fetchAvatar = () => dispatch => {
     type: types.RECEIVE_AVATAR_URL,
     avatarURL: profile.image.url
   }));
-}
+};
 
 const sendRequest = settings => dispatch => {
   dispatch({ type: types.START_PROGRESS });
@@ -69,11 +122,13 @@ const sendRequest = settings => dispatch => {
     dispatch({ type: types.FINISH_PROGRESS });
     return data;    
   }, e => console.log(e));
-}
+};
 
 export const selectTasklist = tasklistID => (dispatch, getState) => {
   const state = getState();
+  // console.log(state);
   if (!state.tasks[tasklistID]) {
+    // console.log('is fetching');
     dispatch(fetchTasks(tasklistID))
       .then(() => dispatch({
         type: types.SELECT_TASKLIST,

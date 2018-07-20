@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
@@ -8,56 +8,94 @@ import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import { toggleDrawer } from '../actions/';
 import TaskLists from './TaskLists';
+import AddTasklistBtn from './AddTasklistBtn';
+import NewTasklistField from './NewTasklistField';
 
-const TasksDrawer = ({ classes, isDrawerOpen, toggleDrawer }) => {
+class TasksDrawer extends Component {
+  constructor(props) {
+    super(props);
 
-  const drawerContent = (
-    <Fragment>
-      <div className={classes.drawerHeader}>
-        <Typography variant='title' color='primary' className={classes.flex}>
-          Списки задач
-        </Typography>
-      </div>
-       <Divider />
-      <TaskLists />
-    </Fragment>
-  );
+    this.state = {
+      textFieldIsVisible: false,
+      drawerScrollTop: 0
+    };
 
-  return (
-    <Fragment>
-      <Hidden smDown>
-        <Drawer
-          anchor='left'
-          open
-          variant='permanent'
-          classes={{
-            paper: classes.drawer
-          }}>
-          { drawerContent }
-        </Drawer>
-      </Hidden>
-      <Hidden mdUp>
-        <Drawer
-          anchor='left'
-          open={isDrawerOpen}
-          onClose={toggleDrawer}
-          variant="temporary"
-          classes={{
-            paper: classes.drawer
-          }}
-          ModalProps={{
-            keepMounted: true
-          }}>
-          { drawerContent }
-        </Drawer>
-      </Hidden>
-    </Fragment>
-  );
+    this.showField = this.showField.bind(this);
+    this.hideField = this.hideField.bind(this);
+  }
+
+  showField() {
+    this.setState({ textFieldIsVisible: true });
+  }
+  hideField() {
+    this.setState({ textFieldIsVisible: false });
+  }
+
+  render() {
+    const { classes, isDrawerOpen, toggleDrawer, isAuthorized } = this.props;
+    const { textFieldIsVisible } = this.state;
+    const drawerContent = (
+      <Fragment>
+        <div >
+        <div className={classes.drawerHeader}>
+          <Typography variant='title' color='primary' className={classes.flex}>
+            Списки задач
+          </Typography>
+        </div>
+         <Divider />
+        <TaskLists>
+          { textFieldIsVisible ?
+            <NewTasklistField 
+              hideField={this.hideField} 
+              isVisible={textFieldIsVisible} /> :
+            null }
+        </TaskLists>
+        { isAuthorized ? 
+          <AddTasklistBtn
+            drawerScrollTop={this.state.drawerScrollTop}
+            showField={this.showField} /> :
+          null }
+        </div>
+      </Fragment>
+    );
+
+    return (
+      <Fragment>
+        <Hidden smDown>
+          <Drawer
+            anchor='left'
+            open
+            variant='permanent'
+            classes={{
+              paper: classes.drawer
+            }}>
+            { drawerContent }
+          </Drawer>
+        </Hidden>
+        <Hidden mdUp>
+          <Drawer
+            anchor='left'
+            open={isDrawerOpen}
+            onClose={toggleDrawer}
+            variant="temporary"
+            classes={{
+              paper: classes.drawer
+            }}
+            ModalProps={{
+              keepMounted: true
+            }}>
+            { drawerContent }
+          </Drawer>
+        </Hidden>
+      </Fragment>
+    );
+  }
 };
 
 const styles = (theme) => ({
   drawer: {
     width: 240,
+    // height: `100%`,
     [theme.breakpoints.up('md')]: {
       position: 'relative',
     },  
@@ -74,7 +112,8 @@ const styles = (theme) => ({
 });
 
 const mapStateToProps = (state) => ({
-  isDrawerOpen: state.isDrawerOpen
+  isDrawerOpen: state.isDrawerOpen,
+  isAuthorized: state.isAuthorized
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -85,6 +124,7 @@ const mapDispatchToProps = (dispatch) => ({
 
 TasksDrawer.propTypes = {
   isDrawerOpen: PropTypes.bool,
+  isAuthorized: PropTypes.bool,
   toggleDrawer: PropTypes.func,
   classes: PropTypes.object
 };
