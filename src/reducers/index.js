@@ -22,6 +22,11 @@ const tasklists = (state = {}, action) => {
       return {
         ...state
       };
+    case types.RENAME_TASKLIST:
+      return {
+        ...state,
+        [action.tasklistID]: action.tasklist
+      };
     default:
       return state;
   }
