@@ -33,16 +33,13 @@ class EditTasklistField extends Component {
   }
 
   checkTextField() {
-    const { cancelEdit,
-            renameTasklist,
-            currentTitle,
-            tasklistID } = this.props;
+    const { handleEditTasklist, currentTitle, cancelEdit } = this.props;
     const { value } = this.state;
 
     if (currentTitle === value) {
       cancelEdit();
     } else {
-      renameTasklist(tasklistID, value).then(cancelEdit);
+      handleEditTasklist(value);
     }
   }
 
@@ -76,11 +73,9 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 EditTasklistField.propTypes = {
-  isFetching: PropsTypes.bool,
   currentTitle: PropsTypes.string,
-  tasklistID: PropsTypes.string,
-  renameTasklist: PropsTypes.func,
-  cancelEdit: PropsTypes.func
+  cancelEdit: PropsTypes.func,
+  handleEditTasklist: PropsTypes.func
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditTasklistField);
