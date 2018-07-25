@@ -21,7 +21,7 @@ export default settings => {
           // if token got expired it's refresh page to the root location;
           window.location.assign(window.location.origin);
         }
-        return Promise.reject(new Error(response.statusText));
+        return Promise.reject(response);
       }
 
       if (response.status === 204) {
@@ -30,7 +30,6 @@ export default settings => {
       
       return response.json();
     }
-  ).then(data => {
-    return Promise.resolve(data);
-  }).catch(e => Promise.reject(e.message));
+  ).then(data => Promise.resolve(data))
+   .catch(e => Promise.reject(e));
 };
