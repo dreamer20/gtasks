@@ -10,6 +10,7 @@ import TasksBar from './TasksBar';
 import TasksDrawer from './TasksDrawer';
 import TaskLists from './TaskLists';
 import Tasks from './Tasks';
+import ErrorSnackbar from './ErrorSnackbar';
 
 class App extends Component {
 
@@ -51,6 +52,7 @@ class App extends Component {
           <main className={classes.content}>
           { currentScreen }</main>
         </div>
+        <ErrorSnackbar />
         </div>
       </Fragment>
     );

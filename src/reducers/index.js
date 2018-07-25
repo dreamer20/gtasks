@@ -106,6 +106,17 @@ const isAuthorized = (state = false, action) => {
   }
 };
 
+const errorMessage = (state = null, action) => {
+  switch (action.type) {
+    case types.SET_ERROR_MESSAGE:
+      return action.message;
+    case types.RESET_ERROR_MESSAGE:
+      return null;
+    default:
+      return state;
+  }
+}
+
 export const getTasksByTasklistID = (tasks, selectedTasklist) => ({
   ...tasks[selectedTasklist]
 });
@@ -119,5 +130,6 @@ export default combineReducers({
   avatarURL,
   tasks,
   selectedTasklist,
-  isAuthorized
+  isAuthorized,
+  errorMessage
 });
