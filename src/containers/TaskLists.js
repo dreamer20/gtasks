@@ -14,7 +14,11 @@ import MenuItem from '@material-ui/core/MenuItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import EditTasklistField from './EditTasklistField';
 import ModalDialog from './ModalDialog';
-import { selectTasklist, deleteTasklist, renameTasklist } from '../actions/';
+import NextPageBtn from './NextPageBtn';
+import { selectTasklist,
+         deleteTasklist,
+         renameTasklist,
+         fetchTasklistsByToken } from '../actions/';
 
 class TaskLists extends Component {
   constructor(props) {
@@ -131,10 +135,10 @@ class TaskLists extends Component {
   render() {
     const { tasklists,
             selectTasklist,
-            children,
+            nextPageToken,
+            fetchTasklistsByToken,
             classes } = this.props;
     const { anchorEl, modalDialogSettings } = this.state;
-
     let list = [];
 
     for (let tasklistID in tasklists) {
@@ -155,7 +159,6 @@ class TaskLists extends Component {
             button 
             key={tasklistID}>
             <ListItemText
-              
               primary={tasklists[tasklistID].title}
               title={tasklists[tasklistID].title} />
             <ListItemSecondaryAction>
@@ -174,8 +177,10 @@ class TaskLists extends Component {
     return (
       <div>
         <List>
-          {children}
           {list}
+          <NextPageBtn
+            nextPageToken={nextPageToken}
+            fetchAction={fetchTasklistsByToken} />
         </List>
         <Menu
             id='TasklistMenu'
@@ -205,7 +210,8 @@ class TaskLists extends Component {
 };
 
 const mapStateToProps = (state) => ({
-  tasklists: state.tasklists
+  tasklists: state.tasklists,
+  nextPageToken: state.nextPageTokens.tasklists
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -219,15 +225,21 @@ const mapDispatchToProps = (dispatch) => ({
 
   renameTasklist(tasklistID, newTitle) {
     return dispatch(renameTasklist(tasklistID, newTitle));
+  },
+
+  fetchTasklistsByToken(pageToken) {
+    dispatch(fetchTasklistsByToken(pageToken));
   }
 });
 
 TaskLists.propTypes = {
   tasklists: PropTypes.object,
   classes: PropTypes.object,
+  nextPageToken: PropTypes.string,
   selectTasklist: PropTypes.func,
   deleteTasklist: PropTypes.func,
-  renameTasklist: PropTypes.func
+  renameTasklist: PropTypes.func,
+  fetchTasklistsByToken: PropTypes.func
 };
 
 const styles = theme => ({

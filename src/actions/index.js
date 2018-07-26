@@ -37,6 +37,20 @@ export const fetchTasklists = () => dispatch => {
   });
 };
 
+export const fetchTasklistsByToken = (pageToken) => dispatch => {
+  const settings = {
+    path: `tasks/v1/users/@me/lists?pageToken=${pageToken}`
+  };
+
+  dispatch(sendRequest(settings))
+  .then((tasklists) => {
+    dispatch({
+      type: types.RECEIVE_TASKLISTS,
+      tasklists
+    });
+  });
+};
+
 export const fetchTasks = (tasklistID) => (dispatch, getState) => {
   const settings = {
     path: `tasks/v1/lists/${tasklistID}/tasks`

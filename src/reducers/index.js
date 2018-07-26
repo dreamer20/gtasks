@@ -117,10 +117,21 @@ const errorMessage = (state = null, action) => {
   }
 }
 
+const nextPageTokens = (state = { tasklists: null }, action) => {
+  switch (action.type) {
+    case types.RECEIVE_TASKLISTS:
+      return {
+        ...state,
+        tasklists: action.tasklists.nextPageToken
+      }
+    default:
+      return state;
+  }
+}
+
 export const getTasksByTasklistID = (tasks, selectedTasklist) => ({
   ...tasks[selectedTasklist]
 });
-
 
 export default combineReducers({
   tasklists,
@@ -131,5 +142,6 @@ export default combineReducers({
   tasks,
   selectedTasklist,
   isAuthorized,
-  errorMessage
+  errorMessage,
+  nextPageTokens
 });
