@@ -37,6 +37,20 @@ export const fetchTasklists = () => dispatch => {
   });
 };
 
+export const fetchTasklistsByToken = (pageToken) => dispatch => {
+  const settings = {
+    path: `tasks/v1/users/@me/lists?pageToken=${pageToken}`
+  };
+
+  dispatch(sendRequest(settings))
+  .then((tasklists) => {
+    dispatch({
+      type: types.RECEIVE_TASKLISTS,
+      tasklists
+    });
+  });
+};
+
 export const fetchTasks = (tasklistID) => (dispatch, getState) => {
   const settings = {
     path: `tasks/v1/lists/${tasklistID}/tasks`
@@ -76,11 +90,15 @@ export const deleteTasklist = (tasklistID) => (dispatch) => {
     method: 'DELETE'
   };
 
-  return dispatch(sendRequest(settings)).then(() => {
-    dispatch({
-      type: types.DELETE_TASKLIST,
-      tasklistID
-    });
+  return dispatch(sendRequest(settings)).then((response) => {
+    if (response && response.error && response.error.message === 'Invalid Value') {
+      dispatch(setErrorMessage('Нельзя удалить список по умолчанию.'));
+    } else {
+      dispatch({
+        type: types.DELETE_TASKLIST,
+        tasklistID
+      });      
+    }
   });
 };
 
@@ -115,20 +133,25 @@ const fetchAvatar = () => dispatch => {
   }));
 };
 
-const sendRequest = settings => dispatch => {
+const sendRequest = settings => (dispatch, getState) => {
   dispatch({ type: types.START_PROGRESS });
   return api(settings)
   .then(data => {
     dispatch({ type: types.FINISH_PROGRESS });
-    return data;    
-  }, e => console.log(e));
+    return data;
+  }, response => {
+    dispatch({ type: types.FINISH_PROGRESS });
+    if (response.status === 400) {
+      return response.json();
+    } else {
+      dispatch(setErrorMessage(`Ошибка: ${response.statusText}`)); 
+    }
+  });
 };
 
 export const selectTasklist = tasklistID => (dispatch, getState) => {
   const state = getState();
-  // console.log(state);
   if (!state.tasks[tasklistID]) {
-    // console.log('is fetching');
     dispatch(fetchTasks(tasklistID))
       .then(() => dispatch({
         type: types.SELECT_TASKLIST,
@@ -149,6 +172,15 @@ export const selectTasklist = tasklistID => (dispatch, getState) => {
 
 export const toggleDrawer = () => ({
   type: types.TOGGLE_DRAWER
+});
+
+export const resetErrorMessage = () => ({
+  type: types.RESET_ERROR_MESSAGE
+});
+
+export const setErrorMessage = message => ({
+  type: types.SET_ERROR_MESSAGE,
+  message
 });
 
 const setScreen = (screen) => ({

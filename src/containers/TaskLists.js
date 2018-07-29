@@ -8,11 +8,17 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Icon from '@material-ui/core/Icon';
 import IconButton from '@material-ui/core/IconButton';
+import Typography from '@material-ui/core/Typography';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import EditTasklistField from './EditTasklistField';
-import { selectTasklist, deleteTasklist } from '../actions/';
+import ModalDialog from './ModalDialog';
+import NextPageBtn from './NextPageBtn';
+import { selectTasklist,
+         deleteTasklist,
+         renameTasklist,
+         fetchTasklistsByToken } from '../actions/';
 
 class TaskLists extends Component {
   constructor(props) {
@@ -20,7 +26,18 @@ class TaskLists extends Component {
 
     this.state = {
       anchorEl: null,
-      editedTasklist: null
+      editedTasklist: null,
+      modalDialogSettings: {
+        isOpen: false,
+        action: '',
+        handler: null,
+        onClose: null
+      }
+    };
+
+    this.editedTasklist = {
+      id: null,
+      newTitle: null
     };
 
     this.handleOpenMenu = this.handleOpenMenu.bind(this);
@@ -29,6 +46,11 @@ class TaskLists extends Component {
     this.editTasklist = this.editTasklist.bind(this);
     this.cancelEditTasklist = this.cancelEditTasklist.bind(this);
     this.handleEditFocus = this.handleEditFocus.bind(this);
+    this.openDeletionModalDialog = this.openDeletionModalDialog.bind(this);
+    this.openEditModalDialog = this.openEditModalDialog.bind(this);
+    this.closeModalDialog = this.closeModalDialog.bind(this);
+    this.handleEditTasklist = this.handleEditTasklist.bind(this);
+    this.renameTasklist = this.renameTasklist.bind(this);
   }
 
   handleOpenMenu(event, tasklistID) {
@@ -42,47 +64,90 @@ class TaskLists extends Component {
 
   deleteTasklist() {
     const { deleteTasklist } = this.props;
+    console.log(this.tasklistID)
+    deleteTasklist(this.tasklistID);
+    this.closeModalDialog();
+  }
 
-    deleteTasklist(this.tasklistID).then(() => {
-      this.setState({ anchorEl: null });
-    });
+  handleEditTasklist(newTitle) {
+    this.editedTasklist.newTitle = newTitle;
+    this.openEditModalDialog();
+  }
+
+  renameTasklist() {
+    const { renameTasklist } = this.props;
+    renameTasklist(this.editedTasklist.id, this.editedTasklist.newTitle)
+      .then(this.cancelEditTasklist);
   }
 
   editTasklist() {
     this.setState({
       anchorEl: null
-    }, () => this.editedTasklistID = this.tasklistID);
+    }, () => this.editedTasklist.id = this.tasklistID);
   }
 
   cancelEditTasklist() {
-    this.editedTasklistID = null;
-    this.forceUpdate();
+    this.editedTasklist.id = null;
+    this.editedTasklist.newTitle = null;
+    this.closeModalDialog();
   }
 
   handleEditFocus() {
     // It's needed to focus field
-    if (this.editedTasklistID) {
+    if (this.editedTasklist.id) {
       this.forceUpdate();
     }
+  }
+
+  openDeletionModalDialog() {
+    this.setState({
+      anchorEl: null,
+      modalDialogSettings: {
+        action: 'delete',
+        handler: this.deleteTasklist,
+        isOpen: true,
+        onClose: this.closeModalDialog
+      }
+    });
+  }
+
+  openEditModalDialog() {
+    this.setState({
+      anchorEl: null,
+      modalDialogSettings: {
+        action: 'edit',
+        handler: this.renameTasklist,
+        isOpen: true,
+        onClose: this.cancelEditTasklist
+      }
+    });
+  }
+
+  closeModalDialog() {
+    this.setState({
+      modalDialogSettings: {
+        ...this.state.modalDialogSettings,
+        isOpen: false
+      }
+    })
   }
 
   render() {
     const { tasklists,
             selectTasklist,
-            children,
+            nextPageToken,
+            fetchTasklistsByToken,
             classes } = this.props;
-    const { anchorEl } = this.state;
-
+    const { anchorEl, modalDialogSettings } = this.state;
     let list = [];
 
     for (let tasklistID in tasklists) {
-      if (this.editedTasklistID === tasklistID) {
+      if (this.editedTasklist.id === tasklistID) {
         list.push(
           <ListItem key={tasklistID}>
             <EditTasklistField
-              tasklistID={tasklistID}
-              isFocused={this.state.isFocused}
               currentTitle={tasklists[tasklistID].title}
+              handleEditTasklist={this.handleEditTasklist}
               cancelEdit={this.cancelEditTasklist} />
           </ListItem>
         );
@@ -94,7 +159,6 @@ class TaskLists extends Component {
             button 
             key={tasklistID}>
             <ListItemText
-              
               primary={tasklists[tasklistID].title}
               title={tasklists[tasklistID].title} />
             <ListItemSecondaryAction>
@@ -113,8 +177,10 @@ class TaskLists extends Component {
     return (
       <div>
         <List>
-          {children}
           {list}
+          <NextPageBtn
+            nextPageToken={nextPageToken}
+            fetchAction={fetchTasklistsByToken} />
         </List>
         <Menu
             id='TasklistMenu'
@@ -122,7 +188,7 @@ class TaskLists extends Component {
             open={Boolean(anchorEl)}
             onClose={this.handleCloseMenu}
             onExited={this.handleEditFocus}>
-            <MenuItem onClick={this.deleteTasklist}>
+            <MenuItem onClick={this.openDeletionModalDialog}>
               <ListItemIcon>
                 <Icon>delete</Icon>
               </ListItemIcon>
@@ -135,13 +201,17 @@ class TaskLists extends Component {
               Переименовать
             </MenuItem>
         </Menu>
+        <ModalDialog
+          settings={modalDialogSettings}
+          />
       </div>
     );    
   }
 };
 
 const mapStateToProps = (state) => ({
-  tasklists: state.tasklists
+  tasklists: state.tasklists,
+  nextPageToken: state.nextPageTokens.tasklists
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -151,20 +221,31 @@ const mapDispatchToProps = (dispatch) => ({
 
   deleteTasklist(tasklistID) {
     return dispatch(deleteTasklist(tasklistID));
+  },
+
+  renameTasklist(tasklistID, newTitle) {
+    return dispatch(renameTasklist(tasklistID, newTitle));
+  },
+
+  fetchTasklistsByToken(pageToken) {
+    dispatch(fetchTasklistsByToken(pageToken));
   }
 });
 
 TaskLists.propTypes = {
   tasklists: PropTypes.object,
   classes: PropTypes.object,
+  nextPageToken: PropTypes.string,
   selectTasklist: PropTypes.func,
-  deleteTasklist: PropTypes.func
+  deleteTasklist: PropTypes.func,
+  renameTasklist: PropTypes.func,
+  fetchTasklistsByToken: PropTypes.func
 };
 
-const styles = {
+const styles = theme => ({
   listItem: {
     overflowX: 'hidden'
   }
-};
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(TaskLists));

@@ -106,10 +106,32 @@ const isAuthorized = (state = false, action) => {
   }
 };
 
+const errorMessage = (state = null, action) => {
+  switch (action.type) {
+    case types.SET_ERROR_MESSAGE:
+      return action.message;
+    case types.RESET_ERROR_MESSAGE:
+      return null;
+    default:
+      return state;
+  }
+}
+
+const nextPageTokens = (state = { tasklists: null }, action) => {
+  switch (action.type) {
+    case types.RECEIVE_TASKLISTS:
+      return {
+        ...state,
+        tasklists: action.tasklists.nextPageToken
+      }
+    default:
+      return state;
+  }
+}
+
 export const getTasksByTasklistID = (tasks, selectedTasklist) => ({
   ...tasks[selectedTasklist]
 });
-
 
 export default combineReducers({
   tasklists,
@@ -119,5 +141,7 @@ export default combineReducers({
   avatarURL,
   tasks,
   selectedTasklist,
-  isAuthorized
+  isAuthorized,
+  errorMessage,
+  nextPageTokens
 });
