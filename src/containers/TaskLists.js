@@ -137,7 +137,8 @@ class TaskLists extends Component {
             selectTasklist,
             nextPageToken,
             fetchTasklistsByToken,
-            classes } = this.props;
+            classes,
+            children } = this.props;
     const { anchorEl, modalDialogSettings } = this.state;
     let list = [];
 
@@ -177,6 +178,7 @@ class TaskLists extends Component {
     return (
       <div>
         <List>
+          {children}
           {list}
           <NextPageBtn
             nextPageToken={nextPageToken}
