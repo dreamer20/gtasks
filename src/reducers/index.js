@@ -43,6 +43,26 @@ const tasks = (state = {}, action) => {
         ...state,
         [action.tasklistID]: tasks
       };
+    case types.RECEIVE_TASK:
+      return {
+        ...state,
+        [action.tasklistID]: {
+          ...state[action.tasklistID],
+          [action.task.id]: action.task
+        }
+      }
+    default:
+      return state;
+  }
+};
+
+const task = (state = {}, action) => {
+  switch (action.type) {
+    case types.RECEIVE_TASK:
+      return {
+        ...state,
+        [action.task.id]: action.task
+      }
     default:
       return state;
   }

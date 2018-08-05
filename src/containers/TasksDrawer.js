@@ -34,7 +34,7 @@ class TasksDrawer extends Component {
   render() {
     const { classes, isDrawerOpen, toggleDrawer, isAuthorized } = this.props;
     const { textFieldIsVisible } = this.state;
-    console.log(textFieldIsVisible);
+
     const drawerContent = (
       <Fragment>
         <div >

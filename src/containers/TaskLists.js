@@ -64,7 +64,6 @@ class TaskLists extends Component {
 
   deleteTasklist() {
     const { deleteTasklist } = this.props;
-    console.log(this.tasklistID)
     deleteTasklist(this.tasklistID);
     this.closeModalDialog();
   }
