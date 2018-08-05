@@ -6,6 +6,7 @@ export const RENAME_TASKLIST = 'EDIT_TASKLIST';
 
 export const RECEIVE_TASKS = 'RECEIVE_TASKS';
 export const RECEIVE_TASK = 'RECEIVE_TASK';
+export const DELETE_TASK = 'DELETE_TASK';
 
 export const TOGGLE_DRAWER = 'TOGGLE_DRAWER';
 export const SET_SCREEN = 'SET_SCREEN';

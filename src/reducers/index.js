@@ -51,6 +51,11 @@ const tasks = (state = {}, action) => {
           [action.task.id]: action.task
         }
       }
+    case types.DELETE_TASK:
+      delete state[action.tasklistID][action.taskID];
+      return {
+        ...state
+      }
     default:
       return state;
   }

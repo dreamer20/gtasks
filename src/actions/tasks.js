@@ -18,6 +18,21 @@ export const fetchTasks = (tasklistID) => (dispatch, getState) => {
   });
 };
 
+export const deleteTask = (tasklistID, taskID) => (dispatch) => {
+  const settings = {
+    path: `tasks/v1/lists/${tasklistID}/tasks/${taskID}`,
+    method: 'DELETE'
+  };
+
+  return dispatch(sendRequest(settings)).then(() => {
+    dispatch({
+        type: types.DELETE_TASK,
+        tasklistID,
+        taskID
+    }); 
+  });
+};
+
 export const toggleTask = (tasklistID, task) => dispatch => {
   const settings = {
     path: `tasks/v1/lists/${tasklistID}/tasks/${task.id}`,
