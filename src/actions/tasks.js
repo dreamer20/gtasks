@@ -33,6 +33,25 @@ export const deleteTask = (tasklistID, taskID) => (dispatch) => {
   });
 };
 
+export const editTask = (tasklistID, taskID, newTitle) => (dispatch) => {
+  const settings = {
+    path: `tasks/v1/lists/${tasklistID}/tasks/${taskID}`,
+    method: 'PUT',
+    body: {
+      id: taskID,
+      title: newTitle
+    }
+  };
+
+  return dispatch(sendRequest(settings)).then((task) => {
+    dispatch({
+      type: types.EDIT_TASK,
+      tasklistID,
+      task
+    });
+  });
+};
+
 export const toggleTask = (tasklistID, task) => dispatch => {
   const settings = {
     path: `tasks/v1/lists/${tasklistID}/tasks/${task.id}`,
