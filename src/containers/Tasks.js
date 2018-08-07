@@ -13,6 +13,8 @@ import Icon from '@material-ui/core/Icon';
 import Checkbox from '@material-ui/core/Checkbox';
 import ModalDialog from './ModalDialog';
 import EditTaskField from './EditTaskField';
+import AddTaskBtn from './AddTaskBtn';
+import NewTaskField from './NewTaskField';
 import { getTasksByTasklistID } from '../reducers/';
 import { toggleTask, deleteTask, editTask } from '../actions/';
 
@@ -22,6 +24,7 @@ class Tasks extends Component {
 
     this.state = {
       anchorEl: null,
+      newTaskFieldIsVisible: false,
       modalDialogSettings: {
         isOpen: false,
         action: '',
@@ -47,6 +50,8 @@ class Tasks extends Component {
     this.handleEditTask = this.handleEditTask.bind(this);
     this.accomplishEdit = this.accomplishEdit.bind(this);
     this.cancelEditTask = this.cancelEditTask.bind(this);
+    this.showNewTaskField = this.showNewTaskField.bind(this);
+    this.hideNewTaskField = this.hideNewTaskField.bind(this);
   }
 
   handleOpenMenu(event, taskID, tasklistID) {
@@ -128,9 +133,16 @@ class Tasks extends Component {
     })
   }
 
+  showNewTaskField() {
+    this.setState({ newTaskFieldIsVisible: true });
+  }
+
+  hideNewTaskField() {
+    this.setState({ newTaskFieldIsVisible: false });
+  }
   render() {
     const { tasks, tasklistID, toggleTask } = this.props;
-    const { anchorEl, modalDialogSettings } = this.state;
+    const { anchorEl, modalDialogSettings, newTaskFieldIsVisible } = this.state;
     let taskList = [];
 
     for (let taskID in tasks) {
@@ -173,6 +185,12 @@ class Tasks extends Component {
       <div>
       <List>
         {taskList}
+        {newTaskFieldIsVisible ?
+          <NewTaskField
+            tasklistID={tasklistID}
+            hideField={this.hideNewTaskField} /> :
+          null
+        }
       </List>
       <Menu
           id='TaskMenu'
@@ -193,6 +211,8 @@ class Tasks extends Component {
             Редактировать
           </MenuItem>
       </Menu>
+      <AddTaskBtn
+        showField={this.showNewTaskField} />
       <ModalDialog
         settings={modalDialogSettings}
         />
