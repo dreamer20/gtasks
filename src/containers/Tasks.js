@@ -14,9 +14,13 @@ import Checkbox from '@material-ui/core/Checkbox';
 import ModalDialog from './ModalDialog';
 import EditTaskField from './EditTaskField';
 import AddTaskBtn from './AddTaskBtn';
+import NextPageBtn from './NextPageBtn';
 import NewTaskField from './NewTaskField';
 import { getTasksByTasklistID } from '../reducers/';
-import { toggleTask, deleteTask, editTask } from '../actions/';
+import { toggleTask,
+         deleteTask,
+         editTask,
+         fetchTasksByToken } from '../actions/';
 
 class Tasks extends Component {
   constructor(props) {
@@ -141,7 +145,11 @@ class Tasks extends Component {
     this.setState({ newTaskFieldIsVisible: false });
   }
   render() {
-    const { tasks, tasklistID, toggleTask } = this.props;
+    const { tasks,
+            tasklistID,
+            toggleTask,
+            fetchTasksByToken,
+            nextPageToken } = this.props;
     const { anchorEl, modalDialogSettings, newTaskFieldIsVisible } = this.state;
     let taskList = [];
 
@@ -185,12 +193,16 @@ class Tasks extends Component {
       <div>
       <List>
         {taskList}
+        <NextPageBtn
+            nextPageToken={nextPageToken}
+            fetchAction={(nextPageToken) => fetchTasksByToken(tasklistID, nextPageToken)} />
         {newTaskFieldIsVisible ?
           <NewTaskField
             tasklistID={tasklistID}
             hideField={this.hideNewTaskField} /> :
           null
         }
+
       </List>
       <Menu
           id='TaskMenu'
@@ -224,7 +236,8 @@ class Tasks extends Component {
 
 const mapStateToProps = (state) => ({
     tasks: getTasksByTasklistID(state.tasks, state.selectedTasklist),
-    tasklistID: state.selectedTasklist
+    tasklistID: state.selectedTasklist,
+    nextPageToken: state.nextPageTokens.tasks,
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -238,15 +251,21 @@ const mapDispatchToProps = (dispatch) => ({
 
   editTask(tasklistID, taskID, newTitle) {
     return dispatch(editTask(tasklistID, taskID, newTitle));
+  },
+
+  fetchTasksByToken(tasklistID, pageToken) {
+    dispatch(fetchTasksByToken(tasklistID, pageToken));
   }
 });
 
 Tasks.propTypes = {
   tasks: PropTypes.object,
   tasklistID: PropTypes.string,
+  nextPageToken: PropTypes.string,
+  fetchTasksByToken: PropTypes.func,
   deleteTask: PropTypes.func,
   toggleTask: PropTypes.func,
-  editTask: PropTypes.func
+  editTask: PropTypes.func,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Tasks);

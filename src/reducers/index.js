@@ -41,7 +41,10 @@ const tasks = (state = {}, action) => {
       });
       return {
         ...state,
-        [action.tasklistID]: tasks
+        [action.tasklistID]: {
+          ...state[action.tasklistID],
+          ...tasks
+        }
       };
     case types.RECEIVE_TASK:
       return {
@@ -148,19 +151,24 @@ const errorMessage = (state = null, action) => {
     default:
       return state;
   }
-}
+};
 
-const nextPageTokens = (state = { tasklists: null }, action) => {
+const nextPageTokens = (state = { tasklists: null, tasks: null }, action) => {
   switch (action.type) {
     case types.RECEIVE_TASKLISTS:
       return {
         ...state,
         tasklists: action.tasklists.nextPageToken
       }
+    case types.RECEIVE_TASKS:
+      return {
+        ...state,
+        tasks: action.tasks.nextPageToken
+      }
     default:
       return state;
   }
-}
+};
 
 export const getTasksByTasklistID = (tasks, selectedTasklist) => ({
   ...tasks[selectedTasklist]

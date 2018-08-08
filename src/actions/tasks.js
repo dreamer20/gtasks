@@ -18,6 +18,22 @@ export const fetchTasks = (tasklistID) => (dispatch, getState) => {
   });
 };
 
+export const fetchTasksByToken = (tasklistID, pageToken) => (dispatch, getState) => {
+  const settings = {
+    path: `tasks/v1/lists/${tasklistID}/tasks?pageToken=${pageToken}`
+  };
+
+  return dispatch(sendRequest(settings))
+  .then((tasks) => {
+    dispatch({
+      type: types.RECEIVE_TASKS,
+      tasklistID,
+      tasks
+    });
+    return Promise.resolve();
+  });
+};
+
 export const addTask = (tasklistID, title) => (dispatch) => {
   const settings = {
     path: `tasks/v1/lists/${tasklistID}/tasks`,
